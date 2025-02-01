@@ -82,7 +82,6 @@ To reveal a hidden message:
 
 The bot will process your image and respond accordingly.
 """
-    bot.reply_to(message, welcome_text)
     bot.copy_message(message.chat.id, -1001421718959, 190)
 
 # Start the bot
