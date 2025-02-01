@@ -1,3 +1,4 @@
 stegano
 pyTelegramBotAPI
 Pillow
+environs
