@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Steganography</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <h1>Image Steganography</h1>
+    
+    <div class="container">
+        <div class="section">
+            <h2>Encode Message</h2>
+            <form id="encodeForm">
+                <div>
+                    <label>Select PNG Image:</label>
+                    <input type="file" name="file" accept=".png" required>
+                </div>
+                <div>
+                    <label>Message:</label>
+                    <textarea name="message" placeholder="Enter your secret message here..." required></textarea>
+                </div>
+                <button type="submit">Encode Message</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Decode Message</h2>
+            <form id="decodeForm">
+                <div>
+                    <label>Select PNG Image:</label>
+                    <input type="file" name="file" accept=".png" required>
+                </div>
+                <button type="submit">Decode Message</button>
+            </form>
+            <div id="decodeResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('encodeForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const submitButton = e.target.querySelector('button');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Encoding...';
+            
+            try {
+                const response = await fetch('/encode', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'encoded_image.png';
+                    a.click();
+                } else {
+                    alert(await response.text());
+                }
+            } catch (error) {
+                alert('Error encoding image');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Encode Message';
+            }
+        };
+
+        document.getElementById('decodeForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const submitButton = e.target.querySelector('button');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Decoding...';
+            
+            try {
+                const response = await fetch('/decode', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const resultDiv = document.getElementById('decodeResult');
+                    resultDiv.textContent = 'Decoded message: ' + data.message;
+                    resultDiv.style.display = 'block';
+                } else {
+                    alert(await response.text());
+                }
+            } catch (error) {
+                alert('Error decoding image');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Decode Message';
+            }
+        };
+    </script>
+</body>
+</html>
