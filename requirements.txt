@@ -2,3 +2,4 @@ stegano
 pyTelegramBotAPI
 Pillow
 environs
+aiogram==2.23.1
